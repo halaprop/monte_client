@@ -50,48 +50,36 @@
   <div id="spinner" class="uk-flex uk-flex-center uk-flex-middle" uk-height-viewport uk-spinner>
   </div>
 
+  <header class="uk-sticky uk-navbar-container" uk-sticky>
+    <div style="padding-bottom: 0px;" class="uk-container">
+      <h2 class="uk-margin-top"><span>Montebook 2013</span></h2>
+
+      <ul uk-tab="connect: #tab-content">
+        <li><a href="#">Families</a></li>
+        <li><a href="#">Staff</a></li>
+        <li><a href="#">Rooms</a></li>
+        <li><a href="#"><span uk-icon="icon: cog"></span></a></li>
+      </ul>
+
+      <input id="search-input" class="uk-input uk-margin-bottom" type="text" placeholder="Search...">
+    </div>
+  </header>
+
   <div class="uk-container">
-    <h2><span>Montebook 2013</span></h2>
-
-    <ul uk-tab="connect: #tab-content">
-      <li><a href="#">Families</a></li>
-      <li><a href="#">Staff</a></li>
-      <li><a href="#">Rooms</a></li>
-      <li><a href="#"><span uk-icon="icon: cog"></span></a></li>
-    </ul>
-
     <ul id="tab-content" class="uk-switcher uk-margin">
       <!-- Families Tab -->
       <li>
-        <input id="search-families-input" class="uk-input uk-margin-bottom" type="text"
-          placeholder="Search Families...">
         <table class="uk-table uk-table-divider">
           <thead>
             <tr>
             </tr>
           </thead>
-          <tbody id="family-table-body">
-            <tr>
-              <td>
-                John & Sally Doe
-                <div class="table-row-subtitle">John Jr., Jeremy</div>
-              </td>
-            </tr>
-            <tr>
-              <td>Jane Smith</td>
-              <td>jane@example.com</td>
-            </tr>
-            <tr>
-              <td>Michael Brown</td>
-              <td>michael@example.com</td>
-            </tr>
-          </tbody>
+          <tbody id="family-table-body"></tbody>
         </table>
       </li>
 
       <!-- Staff Tab -->
       <li>
-        <input class="uk-input uk-margin-bottom" type="text" placeholder="Search Staff...">
         <table class="uk-table uk-table-divider">
           <thead>
             <tr>
@@ -99,7 +87,7 @@
               <th>Position</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="staff-table-body">
             <tr>
               <td>Alice Johnson</td>
               <td>Teacher</td>
@@ -118,7 +106,6 @@
 
       <!-- Rooms Tab -->
       <li>
-        <input class="uk-input uk-margin-bottom" type="text" placeholder="Search Rooms...">
         <table class="uk-table uk-table-divider">
           <thead>
             <tr>
@@ -126,7 +113,7 @@
               <th>Capacity</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="rooms-table-body">
             <tr>
               <td>101</td>
               <td>30</td>
@@ -145,7 +132,6 @@
 
       <!-- Settings Tab -->
       <li>
-        <input class="uk-input uk-margin-bottom" type="text" placeholder="Search Settings...">
         <table class="uk-table uk-table-divider">
           <thead>
             <tr>
@@ -153,7 +139,7 @@
               <th>Value</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="settings-table-body">
             <tr>
               <td>Theme</td>
               <td>Light</td>
@@ -172,7 +158,16 @@
     </ul>
   </div>
 
+
   <script>
+
+    let activeTabIndex = 0;
+    UIkit.util.on('#tab-content', 'shown', function () {
+      activeTabIndex = UIkit.tab('#tab-content').index();
+      console.log('Active tab index:', activeTabIndex);
+    });
+
+
     document.addEventListener('DOMContentLoaded', () => {
       const dataKey = 'appData';
 
@@ -338,7 +333,7 @@
         loginAndFetch(email, password);
       });
 
-      document.getElementById('search-families-input').addEventListener('input', onSearchFamiliesInput);
+      document.getElementById('search-input').addEventListener('input', onSearchFamiliesInput);
 
       start();
     });
