@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UIkit Tabbed Interface</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.21.7/css/uikit.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.21.7/js/uikit.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.21.7/js/uikit-icons.min.js"></script>
+  <style>
+    #spinner {
+      display: none;
+    }
+
+    .uk-container {
+      padding-bottom: 70px;
+      /* Add padding to avoid content being hidden behind the tabs */
+    }
+
+    .table-row-title {
+      font-weight: 500;
+    }
+
+    .table-row-subtitle {
+      font-size: smaller;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="login-modal" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body">
+      <h2 class="uk-modal-title">Login</h2>
+      <form id="login-form">
+        <div class="uk-margin">
+          <input class="uk-input" type="email" id="email" placeholder="Email" required>
+        </div>
+        <div class="uk-margin">
+          <input class="uk-input" type="password" id="password" placeholder="Password" required>
+        </div>
+        <div class="uk-margin">
+          <button class="uk-button uk-button-primary" type="submit">Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="spinner" class="uk-flex uk-flex-center uk-flex-middle" uk-height-viewport uk-spinner>
+  </div>
+
+  <div class="uk-container">
+    <h2><span>Montebook 2013</span></h2>
+
+    <ul uk-tab="connect: #tab-content">
+      <li><a href="#">Families</a></li>
+      <li><a href="#">Staff</a></li>
+      <li><a href="#">Rooms</a></li>
+      <li><a href="#"><span uk-icon="icon: cog"></span></a></li>
+    </ul>
+
+    <ul id="tab-content" class="uk-switcher uk-margin">
+      <!-- Families Tab -->
+      <li>
+        <input id="search-families-input" class="uk-input uk-margin-bottom" type="text"
+          placeholder="Search Families...">
+        <table class="uk-table uk-table-divider">
+          <thead>
+            <tr>
+            </tr>
+          </thead>
+          <tbody id="family-table-body">
+            <tr>
+              <td>
+                John & Sally Doe
+                <div class="table-row-subtitle">John Jr., Jeremy</div>
+              </td>
+            </tr>
+            <tr>
+              <td>Jane Smith</td>
+              <td>jane@example.com</td>
+            </tr>
+            <tr>
+              <td>Michael Brown</td>
+              <td>michael@example.com</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+
+      <!-- Staff Tab -->
+      <li>
+        <input class="uk-input uk-margin-bottom" type="text" placeholder="Search Staff...">
+        <table class="uk-table uk-table-divider">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Position</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Alice Johnson</td>
+              <td>Teacher</td>
+            </tr>
+            <tr>
+              <td>Bob Lee</td>
+              <td>Administrator</td>
+            </tr>
+            <tr>
+              <td>Carol White</td>
+              <td>Janitor</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+
+      <!-- Rooms Tab -->
+      <li>
+        <input class="uk-input uk-margin-bottom" type="text" placeholder="Search Rooms...">
+        <table class="uk-table uk-table-divider">
+          <thead>
+            <tr>
+              <th>Room Number</th>
+              <th>Capacity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>101</td>
+              <td>30</td>
+            </tr>
+            <tr>
+              <td>102</td>
+              <td>25</td>
+            </tr>
+            <tr>
+              <td>103</td>
+              <td>20</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+
+      <!-- Settings Tab -->
+      <li>
+        <input class="uk-input uk-margin-bottom" type="text" placeholder="Search Settings...">
+        <table class="uk-table uk-table-divider">
+          <thead>
+            <tr>
+              <th>Setting</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Theme</td>
+              <td>Light</td>
+            </tr>
+            <tr>
+              <td>Notifications</td>
+              <td>Enabled</td>
+            </tr>
+            <tr>
+              <td>Language</td>
+              <td>English</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+    </ul>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const dataKey = 'appData';
+
+      function start() {
+        const data = getLocalStorage(dataKey);
+        if (data) {
+          initializeTables();
+        } else {
+          UIkit.modal('#login-modal').show();
+        }
+      }
+
+      function setLocalStorage(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      function getLocalStorage(key) {
+        const str = localStorage.getItem(key);
+        const value = str ? JSON.parse(str) : null;
+        return value;
+      }
+
+      function renderFamiliesTable(families) {
+
+        const joinWithCommasAndAmp = strings => {
+          if (strings.length === 1) return strings[0];
+          if (strings.length === 2) return strings.join(' & ');
+          return strings.slice(0, -1).join(', ') + ', & ' + strings[strings.length - 1];
+        }
+
+        const uniqueParents = parentObject => {
+          const uniqueMobiles = new Set();
+          const parents = [];
+
+          for (let key in parentObject) {
+            const parent = parentObject[key];
+            if (!uniqueMobiles.has(parent.mobile)) {
+              uniqueMobiles.add(parent.mobile);
+              parents.push(parent);
+            }
+          }
+          return parents;
+        }
+
+        const familyName = parentObject => {
+          const parents = uniqueParents(parentObject);
+          const lastNames = parents.map(parent => parent.lastName);
+          const uniqueLastNames = [...new Set(lastNames)];
+
+          if (parents.length === 1) {
+            const parent = parents[0];
+            return `${parent.firstName} ${parent.lastName}`;
+          }
+
+          if (uniqueLastNames.length === 1) {
+            if (parents.length === 2) {
+              return `${joinWithCommasAndAmp(parents.map(parent => parent.firstName))} ${uniqueLastNames[0]}`;
+            } else {
+              return `The ${uniqueLastNames[0]} Family`;
+            }
+          }
+
+          if (parents.length === 2) {
+            return joinWithCommasAndAmp(parents.map(parent => `${parent.firstName} ${parent.lastName}`));
+          } else {
+            return `The ${uniqueLastNames.join(', ')} Family`;
+          }
+        }
+
+        const studentsNames = studentObject => {
+          const students = Object.values(studentObject);
+          const firstNames = students.map(student => student.firstName);
+          return firstNames.join(', ');
+        };
+
+        // Initialize your tables with the data
+        const tableBody = document.getElementById('family-table-body');
+        tableBody.innerHTML = '';
+
+        for (let familyId in families) {
+          const family = families[familyId];
+          const title = familyName(family.parents);
+          const subtitle = studentsNames(family.students);
+
+          tableBody.innerHTML += `
+            <tr>
+              <td>
+                <div class="table-row-title">${title}</div>
+                <div class="table-row-subtitle">${subtitle}</div>
+              </td>
+            </tr>
+          `
+        }
+      }
+
+      function initializeTables() {
+        const data = getLocalStorage(dataKey);
+        renderFamiliesTable(data.families)
+      }
+
+      function filterFamilies(searchText) {
+        let result = {};
+        const families = getLocalStorage(dataKey).families;
+        for (let familyId in families) {
+          const family = families[familyId];
+          const familyMembers = [...Object.values(family.parents), ...Object.values(family.students)];
+          const membersString = familyMembers.map(person => `${person.firstName} ${person.lastName}`).join(' ').toLowerCase();
+          const match = membersString.includes(searchText);
+          if (match) {
+            result[familyId] = family;
+          }
+        }
+        return result;
+      }
+
+      function onSearchFamiliesInput(event) {
+        const searchText = event.target.value.toLowerCase();
+        const filteredFamilies = filterFamilies(searchText);
+        renderFamiliesTable(filteredFamilies);
+      }
+
+      async function loginAndFetch(email, password) {
+        document.getElementById('spinner').style.display = 'flex';
+        UIkit.modal('#login-modal').hide(); // Close the modal on successful login
+        try {
+          // Simulate backend login and data fetch
+          const fetchedData = await fetchData(password, 2013);
+          if (fetchedData) {
+            setLocalStorage(dataKey, fetchedData);
+            initializeTables();
+          }
+        } catch (error) {
+          console.error('Error during login and data fetch:', error);
+        } finally {
+          document.getElementById('spinner').style.display = 'none';
+          start();
+        }
+      }
+
+      async function fetchData(password, year) {
+        try {
+          const response = await fetch(`https://montebackup-server.onrender.com/data\?year=${year}`, {
+            headers: {
+              'x-secret-key': password
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      }
+
+      document.getElementById('login-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        loginAndFetch(email, password);
+      });
+
+      document.getElementById('search-families-input').addEventListener('input', onSearchFamiliesInput);
+
+      start();
+    });
+  </script>
+
+</body>
+
+</html>
