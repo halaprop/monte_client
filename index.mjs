@@ -4,12 +4,14 @@
 
 const ROOT_DATA_KEY = 'montebookData';
 let currentEditionYear = 2013;
-let activeTabIndex = 0;
+let activeTabIndex = 2;
 
 // active tab
 UIkit.util.on('#tab-content', 'shown', function () {
   activeTabIndex = UIkit.tab('#tab-content').index();
 });
+
+UIkit.tab('#tab-content').show(activeTabIndex)
 
 // login form
 document.getElementById('login-form').addEventListener('submit', (e) => {
@@ -85,6 +87,7 @@ async function fetchCurrentEdition(password) {
 
 function initializeTables() {
   renderFamiliesTable()
+  renderClassroomsTable();
 }
 
 /*****************************************************************************/
@@ -206,7 +209,21 @@ function renderDetailControlWithFamily(family) {
 // Families tab (might move to its own module)
 /*****************************************************************************/
 
-function setComputedProps(family) {
+function setAllComputedFamilyProps() {
+  const currentEdition = getCurrentEdition();
+  const families = currentEdition.families;
+
+  if (!currentEdition.hasFamiliesComputedProps) {
+    for (let familyId in families) {
+      const family = families[familyId];
+      setComputedFamilyProps(family);
+    }
+    currentEdition.hasFamiliesComputedProps = true;
+    setCurrentEdition(currentEdition);
+  }
+}
+
+function setComputedFamilyProps(family) {
   const searchTerms = [];
 
   const uniqueParents = parentObject => {
@@ -261,23 +278,10 @@ function setComputedProps(family) {
   family.searchString = Array.from(new Set(searchTerms)).join(' ').toLowerCase();
 }
 
-function familiesWithComputedProps() {
-  const currentEdition = getCurrentEdition();
-  const families = currentEdition.families;
-
-  if (!currentEdition.hasFamiliesComputedProps) {
-    for (let familyId in families) {
-      const family = families[familyId];
-      setComputedProps(family);
-    }
-    currentEdition.hasFamiliesComputedProps = true;
-    setCurrentEdition(currentEdition);
-  }
-  return Object.values(families);
-}
-
 function renderFamiliesTable(searchText) {
-  let families = familiesWithComputedProps();
+  setAllComputedFamilyProps();
+  const currentEdition = getCurrentEdition();
+  let families = Object.values(currentEdition.families);
 
   if (searchText) {
     families = families.filter(family => family.searchString.includes(searchText.toLowerCase()));
@@ -303,25 +307,80 @@ function renderFamiliesTable(searchText) {
   });
 }
 
-
-function filterFamilies(searchText) {
-  let result = {};
-  const families = getCurrentEdition().families;
-  for (let familyId in families) {
-    const family = families[familyId];
-    const familyMembers = [...Object.values(family.parents), ...Object.values(family.students)];
-    const membersString = familyMembers.map(person => `${person.firstName} ${person.lastName}`).join(' ').toLowerCase();
-    const match = membersString.includes(searchText);
-    if (match) {
-      result[familyId] = family;
-    }
-  }
-  return result;
-}
-
 function onSearchFamiliesInput(event) {
   const searchText = event.target.value.toLowerCase();
   renderFamiliesTable(searchText);
 }
 
 
+/*****************************************************************************/
+// Rooms tab (might move to its own module)
+/*****************************************************************************/
+
+function setAllComputedClassroomProps() {
+  const currentEdition = getCurrentEdition();
+  const classrooms = currentEdition.classrooms;
+
+  if (!currentEdition.hasClassroomsComputedProps) {
+    const families = currentEdition.families;
+    const staff = currentEdition.staff;
+
+    Object.values(staff).forEach(staff => {
+      if (staff.classroom) {
+        const segments = staff.classroom.split('/');
+        const roomID = segments[segments.length - 1];
+        const classroom = classrooms[roomID];
+
+        classroom.teachers ??= [];
+        classroom.teachers.push(staff);
+        classroom.searchString ??= '';
+        classroom.searchString += `${staff.firstName} ${staff.lastName} `;
+      }
+    });
+
+    Object.values(families).forEach(family => {
+      family.students.forEach(student => {
+        const segments = student.classroom.split('/');
+        const roomID = segments[segments.length - 1];
+        const classroom = classrooms[roomID];
+        classroom.students ??= [];
+        classroom.students.push(student);
+      });
+    });
+
+    Object.values(classrooms).forEach(classroom => {
+      if (classroom.teachers) {
+        classroom.teachers.sort((a, b) => a.lastName.localeCompare(b.lastName));
+        classroom.teacherNames = classroom.teachers.map(teacher => `${teacher.firstName} ${teacher.lastName}`).join(', ');
+      }
+      if (classroom.students) {
+        classroom.students.sort((a, b) => a.lastName.localeCompare(b.lastName));
+      }
+    });
+    currentEdition.hasClassroomsComputedProps = true;
+    setCurrentEdition(currentEdition);
+  }
+}
+
+
+function renderClassroomsTable(searchText) {
+  setAllComputedClassroomProps();
+
+  const currentEdition = getCurrentEdition();
+  const classrooms = Object.values(currentEdition.classrooms);
+
+  if (searchText) {
+    classrooms = classrooms.filter(classroom => classroom.searchString.includes(searchText.toLowerCase()));
+  }
+
+  const tableBody = document.getElementById('classrooms-table-body');
+  tableBody.innerHTML = classrooms.map(classroom => {
+    return `
+        <tr class="classroom-row" data-classroom-id="${classroom.id}">
+          <td>
+            <div class="table-row-title">${classroom.teacherNames}</div>
+            <div class="table-row-subtitle">Room ${classroom.roomNumber}</div>
+          </td>
+        </tr>
+      `}).join('\n');
+}
