@@ -25,6 +25,32 @@
     .table-row-subtitle {
       font-size: smaller;
     }
+
+    .detail-container {
+      position: fixed;
+      top: 0;
+      left: 100%;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      /* Ensure visibility */
+      z-index: 1000;
+      /* Make sure it is above other elements */
+      overflow-y: auto;
+      /* Allow scrolling if content is too tall */
+      transition: left 0.5s ease;
+    }
+
+    .detail-container.show {
+      left: 0;
+    }
+
+    #detail-back-button {
+      border: none;
+      background-color: transparent;
+      padding: 20px;
+    }
+
   </style>
 </head>
 
@@ -64,6 +90,33 @@
       <input id="search-input" class="uk-input uk-margin-bottom" type="text" placeholder="Search...">
     </div>
   </header>
+
+  <div id="detail-container" class="detail-container">
+
+    <nav class="uk-navbar-container" uk-navbar>
+      <div class="uk-navbar-left">
+        <ul class="uk-navbar-nav">
+          <li class="uk-active">
+            <button id="detail-back-button" class="uk-button uk-button-text">
+              <span uk-icon="chevron-left"></span> Families
+          </button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div style="padding: 20px;">
+      <h3 h3 class="uk-margin-remove-bottom">Marge Simpson</h3>
+      <p class="uk-margin-remove-top uk-margin-remove-bottom">marge@hotmail</p>
+      <p class="uk-margin-remove-top">(217) 906-3846</p>
+      <hr>
+      <h3 h3 class="uk-margin-remove-bottom">Homer Simpson</h3>
+      <p class="uk-margin-remove-top uk-margin-remove-bottom">homer@hotmail</p>
+      <p class="uk-margin-remove-top">(217) 906-3846</p>
+    </div>
+
+  </div>
+
 
   <div class="uk-container">
     <ul id="tab-content" class="uk-switcher uk-margin">

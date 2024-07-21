@@ -26,6 +26,11 @@ document.getElementById('search-input').addEventListener('input', event => {
   }
 });
 
+// search input
+document.getElementById('detail-back-button').addEventListener('click', event => {
+  setDetailContainerHidden(true);
+});
+
 /*****************************************************************************/
 // App startup
 /*****************************************************************************/
@@ -116,6 +121,21 @@ function joinWithCommasAndAmp(strings) {
 }
 
 /*****************************************************************************/
+// Detail container
+/*****************************************************************************/
+
+function setDetailContainerHidden(hidden) {
+  const detailContainer = document.getElementById('detail-container');
+  if (hidden) {
+    detailContainer.classList.remove('show');
+  } else {
+    detailContainer.classList.add('show');
+  }
+}
+
+
+
+/*****************************************************************************/
 // Families tab (might move to its own module)
 /*****************************************************************************/
 
@@ -198,7 +218,7 @@ function renderFamiliesTable(searchText) {
 
   const tableBody = document.getElementById('family-table-body');
   tableBody.innerHTML = families.map(family => `
-        <tr>
+        <tr class="family-row" data-family-id="${family.id}">
           <td>
             <div class="table-row-title">${family.familyName}</div>
             <div class="table-row-subtitle">${family.studentsNames}</div>
@@ -206,6 +226,12 @@ function renderFamiliesTable(searchText) {
         </tr>
       `).join('\n');
 
+  document.querySelectorAll('.family-row').forEach(row => {
+    row.addEventListener('click', function () {
+      const familyId = this.dataset.familyId;
+      setDetailContainerHidden(false);
+    });
+  });
 }
 
 
