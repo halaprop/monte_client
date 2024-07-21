@@ -120,6 +120,26 @@ function joinWithCommasAndAmp(strings) {
   return strings.slice(0, -1).join(', ') + ', & ' + strings[strings.length - 1];
 }
 
+function prettyPhone(string) {
+  const digits = string.replace(/\D/g, '');
+  return `(${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7, 11)}`;
+}
+
+function prettyAddress(obj) {
+  const address = [];
+
+  const line1 = [obj.street, obj.number].filter(Boolean).join(' ');
+  address.push(line1 || null);
+
+  const line2 = [obj.city, obj.state].filter(Boolean).join(', ');
+  const line2WithZip = [line2, obj.zip].filter(Boolean).join(' ');
+  address.push(line2WithZip || null);
+
+  address.push(prettyPhone(obj.phone) || null);
+
+  return address;
+}
+
 /*****************************************************************************/
 // Detail container
 /*****************************************************************************/
@@ -133,7 +153,54 @@ function setDetailContainerHidden(hidden) {
   }
 }
 
+function renderDetailControlWithFamily(family) {
+  const tableRow = (title, subtitle, subtitle1, separator, firstTag = "h3") => {
+    let titleMarkdown = '', subtitleMarkdown = '', subtitle1Markdown = '';
 
+    if (title) titleMarkdown = `<${firstTag} class="uk-margin-remove-bottom">${title}</${firstTag}>`;
+    if (subtitle) subtitleMarkdown = `<p class="uk-margin-remove-top uk-margin-remove-bottom">${subtitle}</p>`;
+    if (subtitle1) subtitle1Markdown = `<p class="uk-margin-remove-top">${subtitle1}</p>`
+
+    return `
+      <tr>
+        <td ${separator ? 'class="detail-table-separator"' : ''}>
+          ${titleMarkdown} ${subtitleMarkdown} ${subtitle1Markdown}
+        </td>
+      </tr>
+    `;
+  }
+
+  const roomName = path => {
+    const segments = path.split('/');
+    const roomSegment = segments[segments.length - 1];
+    return roomSegment.replace(/([A-Za-z]+)(\d+)/, '$1 $2');
+  };
+
+  const gradeName = number => {
+    if (number === 0) return "Kinder";
+    const suffix = number === 1 ? "st" : number === 2 ? "nd" : number === 3 ? "rd" : "th";
+    return `${number}${suffix} grade`;
+  }
+
+  const tableBody = document.getElementById('detail-table-body');
+  tableBody.innerHTML = '';
+  Object.values(family.parents).forEach((parent, i, arr) => {
+    let name = `${parent.firstName} ${parent.lastName}`;
+    let mobile = prettyPhone(parent.mobile)
+    tableBody.innerHTML += tableRow(name, parent.email, mobile, i == arr.length - 1)
+  })
+
+  Object.values(family.students).forEach((student, i, arr) => {
+    let name = `${student.firstName} ${student.lastName}`;
+    let gradeRoom = `${gradeName(student.grade)}, ${roomName(student.classroom)}`;
+    tableBody.innerHTML += tableRow(name, gradeRoom, null, i == arr.length - 1)
+  })
+
+  if (family.address) {
+    tableBody.innerHTML += tableRow(...prettyAddress(family.address), false, 'h5');
+  }
+
+}
 
 /*****************************************************************************/
 // Families tab (might move to its own module)
@@ -229,6 +296,8 @@ function renderFamiliesTable(searchText) {
   document.querySelectorAll('.family-row').forEach(row => {
     row.addEventListener('click', function () {
       const familyId = this.dataset.familyId;
+      const family = families.find(family => family.id == familyId);
+      renderDetailControlWithFamily(family);
       setDetailContainerHidden(false);
     });
   });
