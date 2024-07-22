@@ -150,10 +150,10 @@ function prettyAddress(obj) {
   return address;
 }
 
-function prettyGrade(number, units="grade") {
+function prettyGrade(number, gradeSuffix=true) {
   if (number === 0) return "Kinder";
   const suffix = number === 1 ? "st" : number === 2 ? "nd" : number === 3 ? "rd" : "th";
-  return `${number}${suffix} ${units}`;
+  return `${number}${suffix}${gradeSuffix ? ' grade' : ''}`;
 }
 
 /*****************************************************************************/
@@ -403,7 +403,7 @@ function renderClassroomsTable(searchText) {
     gradeRooms.forEach((classroom, i) => {
       let gradesString = '';
       if (classroom.grades.length > 1) {
-        const gradeNumbers = joinWithCommasAndAmp(classroom.grades.map(g => prettyGrade(g, '')));
+        const gradeNumbers = joinWithCommasAndAmp(classroom.grades.map(g => prettyGrade(g, false)));
         gradesString =  `, ${gradeNumbers} grades`
       }
       tableBody.innerHTML += `
