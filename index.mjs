@@ -3,8 +3,10 @@
 /*****************************************************************************/
 
 const ROOT_DATA_KEY = 'montebookData';
-let currentEditionYear = 2013;
+let currentEditionYear = 2017;
 let activeTabIndex = 0;
+
+document.getElementById('app-title').innerHTML = `Montebook ${currentEditionYear}`;
 
 // active tab
 UIkit.util.on('#tab-content', 'shown', function () {
@@ -150,7 +152,7 @@ function prettyAddress(obj) {
   return address;
 }
 
-function prettyGrade(number, gradeSuffix=true) {
+function prettyGrade(number, gradeSuffix = true) {
   if (number === 0) return "Kinder";
   const suffix = number === 1 ? "st" : number === 2 ? "nd" : number === 3 ? "rd" : "th";
   return `${number}${suffix}${gradeSuffix ? ' grade' : ''}`;
@@ -362,6 +364,12 @@ function setAllComputedClassroomProps() {
       });
     });
 
+    // remove classrooms which have no students assigned. (these are probably copy-paste errors from prior years' data)
+    // teachers assigned to these rooms are probably not on staff in this edition. for now, leave them in the staff collection
+    currentEdition.classrooms = Object.fromEntries(
+      Object.entries(currentEdition.classrooms).filter(([_, classroom]) => classroom.students)
+    );
+
     Object.values(classrooms).forEach(classroom => {
       if (classroom.teachers) {
         classroom.teachers.sort((a, b) => a.lastName.localeCompare(b.lastName));
@@ -394,17 +402,25 @@ function renderClassroomsTable(searchText) {
     return acc;
   }, {});
 
+  const edgeKeys = { "Kinder": -1, "Multigrade": 1 };
+  const byGradeKeys = Object.keys(byGrade).sort((a, b) => {
+    if (a in edgeKeys || b in edgeKeys) {
+      return (edgeKeys[a] || 0) - (edgeKeys[b] || 0);
+    }
+    return a.localeCompare(b);
+  });
+
   const tableBody = document.getElementById('classrooms-table-body');
   tableBody.innerHTML = '';
 
-  ["Kinder", "1st grade", "2nd grade", "3rd grade", "4th grade", "5th grade", "Multigrade"].forEach(key => {
+  byGradeKeys.forEach(key => {
     const gradeRooms = byGrade[key].sort((a, b) => a.roomNumber - b.roomNumber);
     tableBody.innerHTML += `<tr><td class="table-divider">${key}</td></tr>`;
     gradeRooms.forEach((classroom, i) => {
       let gradesString = '';
       if (classroom.grades.length > 1) {
         const gradeNumbers = joinWithCommasAndAmp(classroom.grades.map(g => prettyGrade(g, false)));
-        gradesString =  `, ${gradeNumbers} grades`
+        gradesString = `, ${gradeNumbers} grades`
       }
       tableBody.innerHTML += `
           <tr class="classroom-row" data-classroom-id="${classroom.id}">
