@@ -124,6 +124,7 @@ function joinWithCommasAndAmp(strings) {
 
 function prettyPhone(string) {
   const digits = string.replace(/\D/g, '');
+  if (digits.length < 10) return '';
   return `(${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7, 11)}`;
 }
 
@@ -140,6 +141,12 @@ function prettyAddress(obj) {
   address.push(prettyPhone(obj.phone) || null);
 
   return address;
+}
+
+function prettyGrade(number, units="grade") {
+  if (number === 0) return "Kinder";
+  const suffix = number === 1 ? "st" : number === 2 ? "nd" : number === 3 ? "rd" : "th";
+  return `${number}${suffix} ${units}`;
 }
 
 /*****************************************************************************/
@@ -178,12 +185,6 @@ function renderDetailControlWithFamily(family) {
     return roomSegment.replace(/([A-Za-z]+)(\d+)/, '$1 $2');
   };
 
-  const gradeName = number => {
-    if (number === 0) return "Kinder";
-    const suffix = number === 1 ? "st" : number === 2 ? "nd" : number === 3 ? "rd" : "th";
-    return `${number}${suffix} grade`;
-  }
-
   const tableBody = document.getElementById('detail-table-body');
   tableBody.innerHTML = '';
   Object.values(family.parents).forEach((parent, i, arr) => {
@@ -194,15 +195,20 @@ function renderDetailControlWithFamily(family) {
 
   Object.values(family.students).forEach((student, i, arr) => {
     let name = `${student.firstName} ${student.lastName}`;
-    let gradeRoom = `${gradeName(student.grade)}, ${roomName(student.classroom)}`;
+    let gradeRoom = `${prettyGrade(student.grade)}, ${roomName(student.classroom)}`;
     tableBody.innerHTML += tableRow(name, gradeRoom, null, i == arr.length - 1)
   })
 
   if (family.address) {
     tableBody.innerHTML += tableRow(...prettyAddress(family.address), false, 'h5');
   }
-
 }
+
+function renderDetailControlWithClassroom(classroom) {
+  const tableBody = document.getElementById('detail-table-body');
+  tableBody.innerHTML = 'Room ' + classroom.roomNumber;
+}
+
 
 /*****************************************************************************/
 // Families tab (might move to its own module)
@@ -357,13 +363,12 @@ function setAllComputedClassroomProps() {
       if (classroom.students) {
         classroom.students.sort((a, b) => a.lastName.localeCompare(b.lastName));
       }
-      if (classroom.grades) classroom.grades.sort((a, b) => a - b); 
+      if (classroom.grades) classroom.grades.sort((a, b) => a - b);
     });
     currentEdition.hasClassroomsComputedProps = true;
     setCurrentEdition(currentEdition);
   }
 }
-
 
 function renderClassroomsTable(searchText) {
   setAllComputedClassroomProps();
@@ -375,17 +380,43 @@ function renderClassroomsTable(searchText) {
     classrooms = classrooms.filter(classroom => classroom.searchString.includes(searchText.toLowerCase()));
   }
 
+  const byGrade = classrooms.reduce((acc, classroom) => {
+    const grade = classroom.grades.length <= 2 ? prettyGrade(classroom.grades[0]) : "Multigrade";
+    acc[grade] ??= [];
+    acc[grade].push(classroom);
+    return acc;
+  }, {});
+
   const tableBody = document.getElementById('classrooms-table-body');
-  tableBody.innerHTML = classrooms.map((classroom, i) => {
-    if (i%4 == 0) {
-      return `<tr><td class="table-divider">3rd grade</td></tr>`
-    }
-    return `
-        <tr class="classroom-row" data-classroom-id="${classroom.id}">
-          <td>
-            <div class="table-row-title">${classroom.teacherNames}</div>
-            <div class="table-row-subtitle">Room ${classroom.roomNumber} ${JSON.stringify(classroom.grades)}</div>
-          </td>
-        </tr>
-      `}).join('\n');
+  tableBody.innerHTML = '';
+
+  ["Kinder", "1st grade", "2nd grade", "3rd grade", "4th grade", "5th grade", "Multigrade"].forEach(key => {
+    const gradeRooms = byGrade[key].sort((a, b) => a.roomNumber - b.roomNumber);
+    tableBody.innerHTML += `<tr><td class="table-divider">${key}</td></tr>`;
+    gradeRooms.forEach((classroom, i) => {
+      let gradesString = '';
+      if (classroom.grades.length > 1) {
+        const gradeNumbers = joinWithCommasAndAmp(classroom.grades.map(g => prettyGrade(g, '')));
+        gradesString =  `, ${gradeNumbers} grades`
+      }
+      tableBody.innerHTML += `
+          <tr class="classroom-row" data-classroom-id="${classroom.id}">
+            <td>
+              <div class="table-row-title">${classroom.teacherNames}</div>
+              <div class="table-row-subtitle">Room ${classroom.roomNumber}${gradesString}</div>
+            </td>
+          </tr>
+      `;
+    });
+  });
+
+  document.querySelectorAll('.classroom-row').forEach(row => {
+    row.addEventListener('click', function () {
+      const classroomID = this.dataset.classroomId;
+      const classroom = classrooms.find(classroom => classroom.id == classroomID);
+      renderDetailControlWithClassroom(classroom);
+      setDetailContainerHidden(false);
+    });
+  });
+
 }
