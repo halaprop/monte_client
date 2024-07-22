@@ -18,10 +18,14 @@
       /* Add padding to avoid content being hidden behind the tabs */
     }
 
+    .uk-inline {
+      width: 100%;
+    }
+
     .table-divider {
       padding-top: 0 !important;
       padding-bottom: 0 !important;
-      background-color: whitesmoke; 
+      background-color: whitesmoke;
     }
 
     .table-row-title {
@@ -58,7 +62,6 @@
     .detail-table-separator {
       border-bottom: 1px solid black;
     }
-
   </style>
 </head>
 
@@ -95,7 +98,13 @@
         <li><a href="#"><span uk-icon="icon: cog"></span></a></li>
       </ul>
 
-      <input id="search-input" class="uk-input uk-margin-bottom" type="text" placeholder="Search...">
+      <div class="uk-margin-bottom">
+        <div class="uk-inline">
+          <a id="search-clear-button" class="uk-form-icon uk-form-icon-flip" href="#" uk-icon="icon: close"></a>
+          <input id="search-input" class="uk-input" type="text" placeholder="Search...">
+        </div>
+      </div>
+
     </div>
   </header>
 
@@ -105,7 +114,7 @@
       <div class="uk-navbar-left">
         <ul class="uk-navbar-nav">
           <li class="uk-active">
-          <button id="detail-back-button" class="uk-button uk-button-text"><span uk-icon="close"></span></button>
+            <button id="detail-back-button" class="uk-button uk-button-text"><span uk-icon="close"></span></button>
           </li>
         </ul>
       </div>

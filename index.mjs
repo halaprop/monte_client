@@ -21,10 +21,17 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
 });
 
 // search input
-document.getElementById('search-input').addEventListener('input', event => {
+const searchInput = document.getElementById('search-input');
+searchInput.addEventListener('input', event => {
   if (activeTabIndex == 0) {
     onSearchFamiliesInput(event);
   }
+});
+
+document.getElementById('search-clear-button').addEventListener('click', event => {
+  searchInput.value = '';
+  searchInput.focus();
+  searchInput.dispatchEvent(new Event('input'));
 });
 
 // search input
