@@ -4,14 +4,13 @@
 
 const ROOT_DATA_KEY = 'montebookData';
 let currentEditionYear = 2013;
-let activeTabIndex = 2;
+let activeTabIndex = 0;
 
 // active tab
 UIkit.util.on('#tab-content', 'shown', function () {
-  activeTabIndex = UIkit.tab('#tab-content').index();
+  const activeTab = document.querySelector('.uk-switcher li.uk-active');
+  activeTabIndex = Array.from(activeTab.parentNode.children).indexOf(activeTab);
 });
-
-UIkit.tab('#tab-content').show(activeTabIndex)
 
 // login form
 document.getElementById('login-form').addEventListener('submit', (e) => {
@@ -344,7 +343,9 @@ function setAllComputedClassroomProps() {
         const roomID = segments[segments.length - 1];
         const classroom = classrooms[roomID];
         classroom.students ??= [];
+        classroom.grades ??= [];
         classroom.students.push(student);
+        if (!classroom.grades.includes(student.grade)) classroom.grades.push(student.grade);
       });
     });
 
@@ -356,6 +357,7 @@ function setAllComputedClassroomProps() {
       if (classroom.students) {
         classroom.students.sort((a, b) => a.lastName.localeCompare(b.lastName));
       }
+      if (classroom.grades) classroom.grades.sort((a, b) => a - b); 
     });
     currentEdition.hasClassroomsComputedProps = true;
     setCurrentEdition(currentEdition);
@@ -374,12 +376,15 @@ function renderClassroomsTable(searchText) {
   }
 
   const tableBody = document.getElementById('classrooms-table-body');
-  tableBody.innerHTML = classrooms.map(classroom => {
+  tableBody.innerHTML = classrooms.map((classroom, i) => {
+    if (i%4 == 0) {
+      return `<tr><td class="table-divider">3rd grade</td></tr>`
+    }
     return `
         <tr class="classroom-row" data-classroom-id="${classroom.id}">
           <td>
             <div class="table-row-title">${classroom.teacherNames}</div>
-            <div class="table-row-subtitle">Room ${classroom.roomNumber}</div>
+            <div class="table-row-subtitle">Room ${classroom.roomNumber} ${JSON.stringify(classroom.grades)}</div>
           </td>
         </tr>
       `}).join('\n');
