@@ -12,6 +12,7 @@ document.getElementById('app-title').innerHTML = `Montebook ${currentEditionYear
 UIkit.util.on('#tab-content', 'shown', function () {
   const activeTab = document.querySelector('.uk-switcher li.uk-active');
   activeTabIndex = Array.from(activeTab.parentNode.children).indexOf(activeTab);
+  window.scrollTo(0, 0);
 });
 
 // login form
@@ -55,7 +56,7 @@ function start() {
     UIkit.modal('#login-modal').show();
   }
 }
- 
+
 async function loginAndFetch(email, password) {
   document.getElementById('spinner').style.display = 'flex';
   try {
@@ -141,6 +142,7 @@ function joinWithCommasAndAmp(strings) {
 }
 
 function prettyPhone(string) {
+  if (!string) return '';
   const digits = string.replace(/\D/g, '');
   if (digits.length < 10) return '';
   return `(${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7, 11)}`;
@@ -224,7 +226,38 @@ function renderDetailControlWithFamily(family) {
 
 function renderDetailControlWithClassroom(classroom) {
   const tableBody = document.getElementById('detail-table-body');
-  tableBody.innerHTML = 'Room ' + classroom.roomNumber;
+  tableBody.innerHTML = '';
+
+  const teachers = Object.values(classroom.teachers);
+  tableBody.innerHTML += `<tr><td class="table-divider uk-flex uk-flex-middle">${teachers.length > 1 ? 'Teachers' : 'Teacher'}</td></tr>`;
+
+  teachers.forEach((teacher, i, arr) => {
+    let separator = i == arr.length - 1;
+    tableBody.innerHTML += `
+      <tr>
+        <td>
+          <h3 class="uk-margin-remove-bottom">${teacher.firstName} ${teacher.lastName}</h3>
+          <p class="uk-margin-remove-top uk-margin-remove-bottom">${prettyPhone(teacher.mobile)}</p>
+          <p class="uk-margin-remove-top">${teacher.email}</p>
+        </td>
+      </tr>
+    `;
+  });
+
+  const multigrade = classroom.grades.length > 1;
+  tableBody.innerHTML += `<tr><td class="table-divider uk-flex uk-flex-middle">Students</td></tr>`;
+
+  classroom.students.forEach(student => {
+    const suffix = multigrade ? `<span style="float: right;"><small>${prettyGrade(student.grade)}</small></span>` : '';
+    tableBody.innerHTML += `
+      <tr>
+        <td>
+          <p>${student.firstName} ${student.lastName}${suffix}</p>
+        </td>
+      </tr>
+    `;
+  })
+
 }
 
 
@@ -424,7 +457,7 @@ function renderClassroomsTable(searchText) {
 
   byGradeKeys.forEach(key => {
     const gradeRooms = byGrade[key].sort((a, b) => a.roomNumber - b.roomNumber);
-    tableBody.innerHTML += `<tr><td class="table-divider">${key}</td></tr>`;
+    tableBody.innerHTML += `<tr><td class="table-divider uk-flex uk-flex-middle">${key}</td></tr>`;
     gradeRooms.forEach((classroom, i) => {
       let gradesString = '';
       if (classroom.grades.length > 1) {
