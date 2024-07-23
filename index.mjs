@@ -5,14 +5,19 @@
 const ROOT_DATA_KEY = 'montebookData';
 let currentEditionYear = 2017;
 let activeTabIndex = 0;
+let searchInputValues = { 0: '', 1: '', 2: '', 3: '' };
 
 document.getElementById('app-title').innerHTML = `Montebook ${currentEditionYear}`;
 
 // active tab
 UIkit.util.on('#tab-content', 'shown', function () {
+  searchInputValues[activeTabIndex] = searchInput.value;
+
   const activeTab = document.querySelector('.uk-switcher li.uk-active');
   activeTabIndex = Array.from(activeTab.parentNode.children).indexOf(activeTab);
+  
   window.scrollTo(0, 0);
+  searchInput.value = searchInputValues[activeTabIndex];
 });
 
 // login form
@@ -28,6 +33,10 @@ const searchInput = document.getElementById('search-input');
 searchInput.addEventListener('input', event => {
   if (activeTabIndex == 0) {
     onSearchFamiliesInput(event);
+  } else if (activeTabIndex == 1) {
+
+  } else {
+    onSearchClassroomsInput(event);
   }
 });
 
@@ -368,6 +377,10 @@ function onSearchFamiliesInput(event) {
   renderFamiliesTable(searchText);
 }
 
+function onSearchClassroomsInput(event) {
+  const searchText = event.target.value.toLowerCase();
+  renderClassroomsTable(searchText)
+}
 
 /*****************************************************************************/
 // Rooms tab (might move to its own module)
@@ -390,7 +403,7 @@ function setAllComputedClassroomProps() {
         classroom.teachers ??= [];
         classroom.teachers.push(staff);
         classroom.searchString ??= '';
-        classroom.searchString += `${staff.firstName} ${staff.lastName} `;
+        classroom.searchString += `${staff.firstName} ${staff.lastName} `.toLowerCase();
       }
     });
 
@@ -431,8 +444,7 @@ function renderClassroomsTable(searchText) {
   setAllComputedClassroomProps();
 
   const currentEdition = getCurrentEdition();
-  const classrooms = Object.values(currentEdition.classrooms);
-
+  let classrooms = Object.values(currentEdition.classrooms);
   if (searchText) {
     classrooms = classrooms.filter(classroom => classroom.searchString.includes(searchText.toLowerCase()));
   }
