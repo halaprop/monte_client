@@ -55,22 +55,32 @@ function start() {
     UIkit.modal('#login-modal').show();
   }
 }
-
+ 
 async function loginAndFetch(email, password) {
   document.getElementById('spinner').style.display = 'flex';
-  UIkit.modal('#login-modal').hide(); // Close the modal on successful login
   try {
     const currentEdition = await fetchCurrentEdition(password);
-    if (currentEdition) {
-      setCurrentEdition(currentEdition);
-      initializeTables();
-    }
+    setCurrentEdition(currentEdition);
+    initializeTables();
+    UIkit.modal('#login-modal').hide();
+    start();
+
   } catch (error) {
-    console.error('Error during login and data fetch:', error);
+    console.error('Error on fetch', error);
+    showLoginAlert('Unable to login.')
   } finally {
     document.getElementById('spinner').style.display = 'none';
-    start();
   }
+}
+
+function showLoginAlert(message) {
+  const container = document.getElementById('login-alert-container');
+  container.innerHTML = `
+    <div class="uk-alert-danger" uk-alert>
+        <a href class="uk-alert-close" uk-close></a>
+        <p>${message}</p>
+    </div>
+  `;
 }
 
 // current edition is the edition for the current dataYear
@@ -83,13 +93,12 @@ async function fetchCurrentEdition(password) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error, status: ${response.status}`);
     }
-
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error fetching data:', error);
+    throw error;
   }
 }
 
