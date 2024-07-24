@@ -18,9 +18,9 @@ function renderDetailControlWithClassroom(classroom) {
     tableBody.innerHTML += `
       <tr>
         <td>
-          <h3 class="uk-margin-remove-bottom">${teacher.firstName} ${teacher.lastName}</h3>
-          <p class="uk-margin-remove-top uk-margin-remove-bottom">${utils.prettyPhone(teacher.mobile)}</p>
-          <p class="uk-margin-remove-top">${teacher.email}</p>
+          <div class="table-row-title uk-margin-remove-bottom">${teacher.firstName} ${teacher.lastName}</div>
+          <p class="table-row-subtitle uk-margin-remove-top uk-margin-remove-bottom">${utils.prettyPhone(teacher.mobile)}</p>
+          <p class="table-row-subtitle uk-margin-remove-top">${teacher.email}</p>
         </td>
       </tr>
     `;

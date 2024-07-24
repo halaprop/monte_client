@@ -44,11 +44,8 @@
       width: 100%;
       height: 100%;
       background-color: white;
-      /* Ensure visibility */
       z-index: 1000;
-      /* Make sure it is above other elements */
       overflow-y: auto;
-      /* Allow scrolling if content is too tall */
       transition: left 0.5s ease;
     }
 
@@ -139,27 +136,8 @@
 
       <!-- Staff Tab -->
       <li>
-        <table class="uk-table uk-table-divider">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Position</th>
-            </tr>
-          </thead>
-          <tbody id="staff-table-body">
-            <tr>
-              <td>Alice Johnson</td>
-              <td>Teacher</td>
-            </tr>
-            <tr>
-              <td>Bob Lee</td>
-              <td>Administrator</td>
-            </tr>
-            <tr>
-              <td>Carol White</td>
-              <td>Janitor</td>
-            </tr>
-          </tbody>
+        <table class="uk-table uk-table-divider uk-margin-small-top">
+          <tbody id="staff-table-body"></tbody>
         </table>
       </li>
 

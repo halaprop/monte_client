@@ -4,6 +4,7 @@ import * as utils from './utils.mjs';
 // these imports are circular to kick off the ui:
 import {  renderClassroomsTable } from './classroomsTab.mjs';
 import {  renderFamiliesTable } from './familyTab.mjs';
+import {  renderStaffTable } from './staffTab.mjs';
 
 
 /*****************************************************************************/
@@ -122,6 +123,7 @@ async function fetchCurrentEdition(password) {
 function initializeTables() {
   renderFamiliesTable()
   renderClassroomsTable();
+  renderStaffTable();
 }
 
 /*****************************************************************************/
