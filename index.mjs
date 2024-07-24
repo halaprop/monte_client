@@ -2,9 +2,9 @@
 import * as utils from './utils.mjs'; 
 
 // these imports are circular to kick off the ui:
-import {  renderClassroomsTable } from './classroomsTab.mjs';
-import {  renderFamiliesTable } from './familyTab.mjs';
-import {  renderStaffTable } from './staffTab.mjs';
+import {  renderFamiliesTable, onSearchFamiliesInput } from './familyTab.mjs';
+import {  renderStaffTable, onSearchStaffInput } from './staffTab.mjs';
+import {  renderClassroomsTable, onSearchClassroomsInput } from './classroomsTab.mjs';
 
 
 /*****************************************************************************/
@@ -42,7 +42,7 @@ searchInput.addEventListener('input', event => {
   if (activeTabIndex == 0) {
     onSearchFamiliesInput(event);
   } else if (activeTabIndex == 1) {
-
+    onSearchStaffInput(event);
   } else {
     onSearchClassroomsInput(event);
   }

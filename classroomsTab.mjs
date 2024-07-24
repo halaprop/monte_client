@@ -157,3 +157,8 @@ export function renderClassroomsTable(searchText) {
   });
 
 }
+
+export function onSearchClassroomsInput(event) {
+  const searchText = event.target.value.toLowerCase();
+  renderClassroomsTable(searchText)
+}

@@ -19,7 +19,10 @@ function setAllComputedStaffProps() {
   const staff = currentEdition.staff;
 
   if (!currentEdition.hasStaffComputedProps) {
-    // mutate staff here
+    for (let staffID in staff) {
+      const s = staff[staffID];
+      s.searchString = `${s.firstName} ${s.lastName}`.toLowerCase();
+    }
     currentEdition.hasStaffComputedProps = true;
     utils.setEdition(currentEditionYear, currentEdition);
   }
@@ -81,4 +84,9 @@ export function renderStaffTable(searchText) {
     });
   }
 
+}
+
+export function onSearchStaffInput(event) {
+  const searchText = event.target.value.toLowerCase();
+  renderStaffTable(searchText);
 }

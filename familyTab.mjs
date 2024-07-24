@@ -151,11 +151,6 @@ export function renderFamiliesTable(searchText) {
   });
 }
 
-function onSearchClassroomsInput(event) {
-  const searchText = event.target.value.toLowerCase();
-  renderClassroomsTable(searchText)
-}
-
 export function onSearchFamiliesInput(event) {
   const searchText = event.target.value.toLowerCase();
   renderFamiliesTable(searchText);
