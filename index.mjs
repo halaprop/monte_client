@@ -5,7 +5,7 @@ import * as utils from './utils.mjs';
 import {  renderFamiliesTable, onSearchFamiliesInput } from './familyTab.mjs';
 import {  renderStaffTable, onSearchStaffInput } from './staffTab.mjs';
 import {  renderClassroomsTable, onSearchClassroomsInput } from './classroomsTab.mjs';
-
+import {  renderSettingsTable } from './settingsTab.mjs';
 
 /*****************************************************************************/
 // Setup app
@@ -43,7 +43,7 @@ searchInput.addEventListener('input', event => {
     onSearchFamiliesInput(event);
   } else if (activeTabIndex == 1) {
     onSearchStaffInput(event);
-  } else {
+  } else if (activeTabIndex == 2) {
     onSearchClassroomsInput(event);
   }
 });
@@ -124,6 +124,7 @@ function initializeTables() {
   renderFamiliesTable()
   renderClassroomsTable();
   renderStaffTable();
+  renderSettingsTable();
 }
 
 /*****************************************************************************/

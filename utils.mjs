@@ -15,6 +15,10 @@ function setRootData(value) {
   localStorage.setItem(ROOT_DATA_KEY, JSON.stringify(value));
 }
 
+export function cachedEditions() {
+  return Object.keys(getRootData());
+}
+
 export function getEdition(year) {
   const data = getRootData();
   return data ? data[year] : null;
