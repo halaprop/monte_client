@@ -3,18 +3,14 @@ import { cachedEditions } from "./utils.mjs";
 
 
 export function renderSettingsTable() {
-
   const settingsRow = year => {
     const icon = cachedEditions().includes(year) ? '' : '<span uk-icon="icon: download"></span>';
     const checked = year == currentEditionYear ? 'checked' : '';
     return `
       <tr>
         <td>
-          <div class="uk-flex uk-flex-between uk-flex-middle">
-            <div class="uk-flex uk-flex-left uk-flex-middle">
-              <input type="radio" name="edition" id="year-${year}" value="${year}" ${checked}>&nbsp;  ${year}
-              
-            </div>
+          <div class="uk-flex uk-flex-between">
+            <span><input type="radio" name="edition" id="year-${year}" value="${year}" ${checked}> ${year}</span>
             ${icon}
           </div>
         </td>
@@ -27,7 +23,5 @@ export function renderSettingsTable() {
 
   ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'].forEach(year => {
     tableBody.innerHTML += settingsRow(year);
-  })
-
-
+  });
 }
