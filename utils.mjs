@@ -3,6 +3,7 @@
 /*****************************************************************************/
 
 const ROOT_DATA_KEY = 'montebookData';
+const USER_STATE_KEY = 'montebookUserState';
 
 // storage
 function getRootData() {
@@ -15,8 +16,20 @@ function setRootData(value) {
   localStorage.setItem(ROOT_DATA_KEY, JSON.stringify(value));
 }
 
+export function getUserState() {
+  const str = localStorage.getItem(USER_STATE_KEY);
+  const value = str ? JSON.parse(str) : null;
+  return value || { currentEditionYear: null, activeTabIndex: 3, searchInputValues: { 0: '', 1: '', 2: '', 3: '' }  }
+}
+
+export function setUserState(value) {
+  localStorage.setItem(USER_STATE_KEY, JSON.stringify(value));
+}
+
+/*****************************************************************************/
+
 export function cachedEditions() {
-  return Object.keys(getRootData());
+  return Object.keys(getRootData() || {});
 }
 
 export function getEdition(year) {
@@ -29,6 +42,8 @@ export function setEdition(year, edition) {
   data[year] = edition;
   setRootData(data);
 }
+
+/*****************************************************************************/
 
 // other utils
 export function joinWithCommasAndAmp(strings) {

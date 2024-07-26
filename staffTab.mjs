@@ -1,5 +1,4 @@
 import * as utils from './utils.mjs';
-import { currentEditionYear, setDetailContainerHidden } from './index.mjs';
 
 /*****************************************************************************/
 // Staff detail
@@ -15,6 +14,7 @@ function renderDetailControlWithStaff(staff) {
 /*****************************************************************************/
 
 function setAllComputedStaffProps() {
+  const currentEditionYear = utils.getUserState().currentEditionYear;
   const currentEdition = utils.getEdition(currentEditionYear);
   const staff = currentEdition.staff;
 
@@ -43,6 +43,7 @@ export function renderStaffTable(searchText) {
 
   setAllComputedStaffProps();
 
+  const currentEditionYear = utils.getUserState().currentEditionYear;
   const currentEdition = utils.getEdition(currentEditionYear);
   let staff = Object.values(currentEdition.staff);
 

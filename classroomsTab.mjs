@@ -1,5 +1,5 @@
 import * as utils from './utils.mjs';
-import { currentEditionYear, setDetailContainerHidden } from './index.mjs'; 
+import { setDetailContainerHidden } from './index.mjs'; 
 
 
 /*****************************************************************************/
@@ -47,6 +47,7 @@ function renderDetailControlWithClassroom(classroom) {
 /*****************************************************************************/
 
 function setAllComputedClassroomProps() {
+  const currentEditionYear = utils.getUserState().currentEditionYear;
   const currentEdition = utils.getEdition(currentEditionYear);
   const classrooms = currentEdition.classrooms;
 
@@ -103,6 +104,7 @@ function setAllComputedClassroomProps() {
 export function renderClassroomsTable(searchText) {
   setAllComputedClassroomProps();
 
+  const currentEditionYear = utils.getUserState().currentEditionYear;
   const currentEdition = utils.getEdition(currentEditionYear);
   let classrooms = Object.values(currentEdition.classrooms);
   if (searchText) {

@@ -1,5 +1,5 @@
 import * as utils from './utils.mjs'; 
-import { currentEditionYear, setDetailContainerHidden } from './index.mjs'; 
+import { setDetailContainerHidden } from './index.mjs'; 
 
 
 /*****************************************************************************/
@@ -54,6 +54,7 @@ function renderDetailControlWithFamily(family) {
 /*****************************************************************************/
 
 function setAllComputedFamilyProps() {
+  const currentEditionYear = utils.getUserState().currentEditionYear;
   const currentEdition = utils.getEdition(currentEditionYear);
   const families = currentEdition.families;
 
@@ -124,6 +125,7 @@ function setComputedFamilyProps(family) {
 
 export function renderFamiliesTable(searchText) {
   setAllComputedFamilyProps();
+  const currentEditionYear = utils.getUserState().currentEditionYear;
   const currentEdition = utils.getEdition(currentEditionYear);
   let families = Object.values(currentEdition.families);
 
