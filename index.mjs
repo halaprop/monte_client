@@ -11,9 +11,6 @@ import { renderSettingsTable } from './settingsTab.mjs';
 // Setup app
 /*****************************************************************************/
 
-const currentEditionYear = utils.getUserState().currentEditionYear;
-document.getElementById('app-title').innerHTML = `Montebook ${currentEditionYear || ''}`;
-
 // active tab
 UIkit.util.on('#tab-content', 'shown', function () {
   const userState = utils.getUserState()
@@ -73,8 +70,9 @@ document.getElementById('detail-back-button').addEventListener('click', event =>
 start();
 
 function start() {
-  const year = utils.getUserState().currentEditionYear;
-  if (year) {
+  const currentEditionYear = utils.getUserState().currentEditionYear;
+  if (currentEditionYear) {
+    document.getElementById('app-title').innerHTML = `Montebook ${currentEditionYear}`;
     const data = utils.getEdition(currentEditionYear);
     initializeTables();
   } else {
@@ -87,13 +85,11 @@ function start() {
 export function switchToEdition(selectedYear) {
   const currentEdition = utils.getEdition(selectedYear);
   if (currentEdition) {
-    utils.setEdition(selectedYear, currentEdition);
     let userState = utils.getUserState();
     userState.currentEditionYear = selectedYear;
     utils.setUserState(userState);
-    document.getElementById('app-title').innerHTML = `Montebook ${currentEditionYear || ''}`;
+    document.getElementById('app-title').innerHTML = `Montebook ${selectedYear || ''}`;
     initializeTables();
-    UIkit.modal('#login-modal').hide();
     setActiveTab(0);
   } else {
     document.querySelector('#login-modal').setAttribute('data-selected-year', selectedYear);
@@ -117,19 +113,17 @@ async function loginAndFetch(email, password, selectedYear) {
   document.getElementById('spinner').style.display = 'flex';
   try {
     const currentEdition = await fetchEdition(password, selectedYear);
-
-
-
+    utils.setEdition(selectedYear, currentEdition);
+    switchToEdition(selectedYear)
+    UIkit.modal('#login-modal').hide();
   } catch (error) {
     console.error('Error on fetch', error);
     showLoginAlert('Unable to login.')
   } finally {
     document.getElementById('spinner').style.display = 'none';
-
   }
 }
 
-// current edition is the edition for the current dataYear
 async function fetchEdition(password, year) {
   try {
     const response = await fetch(`https://montebackup-server.onrender.com/data\?year=${year}`, {
