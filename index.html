@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Montebook</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180x180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/icons/apple-touch-icon-144x144.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.21.7/css/uikit.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.21.7/js/uikit.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.21.7/js/uikit-icons.min.js"></script>
+  <style>
+    #spinner {
+      display: none;
+    }
+
+    .uk-container {
+      padding-bottom: 70px;
+      /* Add padding to avoid content being hidden behind the tabs */
+    }
+
+    .uk-inline {
+      width: 100%;
+    }
+
+    .table-divider {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      background-color: whitesmoke;
+      height: 2rem;
+    }
+
+    .table-row-title {
+      font-weight: 500;
+    }
+
+    .table-row-subtitle {
+      font-size: smaller;
+    }
+
+    .detail-container {
+      position: fixed;
+      top: 0;
+      left: 100%;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      z-index: 1000;
+      overflow-y: auto;
+      transition: left 0.5s ease;
+    }
+
+    .detail-container.show {
+      left: 0;
+    }
+
+    #detail-back-button {
+      padding: 20px;
+    }
+
+    .detail-table-separator {
+      border-bottom: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="login-modal" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body">
+      <h2 class="uk-modal-title">Login</h2>
+      <form id="login-form">
+        <div class="uk-margin">
+          <input class="uk-input" type="email" id="email" placeholder="Email" required="" autocomplete="email">
+        </div>
+        <div class="uk-margin">
+          <input class="uk-input" type="password" id="password" placeholder="Password" required>
+        </div>
+        <div id="login-alert-container"></div>
+        <div class="uk-margin">
+          <button class="uk-button uk-button-primary" type="submit">Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="spinner" class="uk-flex uk-flex-center uk-flex-middle" uk-height-viewport uk-spinner>
+  </div>
+
+  <header class="uk-sticky uk-navbar-container" uk-sticky>
+    <div style="padding-bottom: 0px;" class="uk-container">
+      <h2 id="app-title" class="uk-margin-top">Montebook</h2>
+
+      <ul id="tabs-root" uk-tab="connect: #tab-content">
+        <li><a href="#">Families</a></li>
+        <li><a href="#">Staff</a></li>
+        <li><a href="#">Rooms</a></li>
+        <li><a href="#"><span uk-icon="icon: cog"></span></a></li>
+      </ul>
+
+      <div class="uk-margin-bottom">
+        <div class="uk-inline">
+          <a id="search-clear-button" class="uk-form-icon uk-form-icon-flip" href="#" uk-icon="icon: close"></a>
+          <input id="search-input" class="uk-input" type="text" placeholder="Search...">
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <div id="detail-container" class="detail-container">
+
+    <nav class="uk-navbar-container" uk-navbar>
+      <div class="uk-navbar-left">
+        <ul class="uk-navbar-nav">
+          <li class="uk-active">
+            <button id="detail-back-button" class="uk-button uk-button-text"><span uk-icon="close"></span></button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <table class="uk-table uk-table-divider">
+      <tbody id="detail-table-body"></tbody>
+    </table>
+  </div>
+
+
+  <div class="uk-container">
+    <ul id="tab-content" class="uk-switcher uk-margin">
+      <!-- Families Tab -->
+      <li>
+        <table class="uk-table uk-table-divider">
+          <tbody id="family-table-body"></tbody>
+        </table>
+      </li>
+
+      <!-- Staff Tab -->
+      <li>
+        <table class="uk-table uk-table-divider uk-margin-small-top">
+          <tbody id="staff-table-body"></tbody>
+        </table>
+      </li>
+
+      <!-- Rooms Tab -->
+      <li>
+        <table class="uk-table uk-table-divider uk-margin-small-top">
+          <tbody id="classrooms-table-body"></tbody>
+        </table>
+      </li>
+
+      <!-- Settings Tab -->
+      <li>
+        <table class="uk-table uk-table-divider">
+          <thead>
+            <tr>
+              <th>Select Edition</th>
+            </tr>
+          </thead>
+          <tbody id="settings-table-body"></tbody>
+        </table>
+      </li>
+    </ul>
+  </div>
+
+  <script type="module" src="./index.mjs" defer></script>
+
+</body>
+
+</html>
